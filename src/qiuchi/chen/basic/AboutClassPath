@@ -1,0 +1,16 @@
+The javac compiler always looks for files in the current directory, but the java
+virtual machine launcher only looks into the current directory if the “.”
+directory is on the class path. If you have no class path set, this is not a
+problem—the default class path consists of the “.” directory. But if you have
+set the class path and forgot to include the “.” directory, your programs will
+compile without error, but they won’t run.
+
+Some people recommend to set the CLASSPATH environment variable
+permanently. This is generally a bad idea. People forget the global setting, and
+are surprised when their classes are not loaded properly. A particularly
+reprehensible example is Apple’s QuickTime installer in Windows. For several
+years, it globally set CLASSPATH to point to a JAR file it needed, but did not
+include the current directory in the classpath. As a result, countless Java
+programmers were driven to distraction when their programs compiled but
+failed to run.
+

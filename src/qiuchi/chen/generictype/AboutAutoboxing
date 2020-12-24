@@ -1,0 +1,7 @@
+However, a Java implementation may, if it chooses, wrap commonly occurring values into identical
+objects, and thus the comparison might succeed. This ambiguity is not what you want. The remedy is to
+call the equals method when comparing wrapper objects.
+
+The autoboxing specification requires that boolean, byte, char ≤ 127, short, and int between -
+128 and 127 are wrapped into fixed objects. For example, if a and b had been initialized with 100
+in the preceding example, then the comparison would have had to succeed.

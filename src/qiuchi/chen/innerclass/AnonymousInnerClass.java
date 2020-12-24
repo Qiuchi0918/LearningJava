@@ -7,8 +7,7 @@ interface ISomeInterface {
 abstract class AbClass {
     private int mem;
 
-    public AbClass(int arg) {
-        mem = arg;
+    public AbClass() {
     }
 
     public int He() {
@@ -23,10 +22,14 @@ class SomeClass {
 }
 
 public class AnonymousInnerClass {
-    public ISomeInterface Get() {
+
+    public ISomeInterface Get(int p) {
         return new ISomeInterface() {
+            int intMem = p;
+
             @Override
             public void But() {
+                int a = p;
             }
         };
     }
@@ -44,15 +47,16 @@ public class AnonymousInnerClass {
 
     public static void main(String[] args) {
         AnonymousInnerClass outer = new AnonymousInnerClass();
-        ISomeInterface anoInner = outer.Get();
+        ISomeInterface anoInner = outer.Get(1);
         //虚类也可以用跟匿名类相似的方法声明并顺便创建实例
         for (int[] i = {0}; i[0] < 5; i[0]++) {
-            AbClass a = new AbClass(i[0]) {
+            AbClass a = new AbClass() {
                 {
                     System.out.println("Born");
                     i[0]++;
                     //<?>为什么必须要final？
-                    //数组怎么不要final也行
+                    //为什么引用类型不用final也行
+                    //corejava p281
                 }
 
                 @Override

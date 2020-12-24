@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class SomethingBasic {
     static void SharedString() {
-        //注意下String pool这个概念
+        //<!>注意下String pool这个概念
         String a = "123", b = "123";
         System.out.println(a == b);
         //<?>返回true，自动指向已有string？
@@ -31,9 +31,9 @@ public class SomethingBasic {
         //Console console = System.console();
         //console.readLine("123123");
         //console.readPassword("123123");
-        //只有命令行启动才有用，否则返回空指针
+        //<!>只有命令行启动才有用，否则返回空指针
         try {
-            //Scanner的String构造参数时source，不是path，给啥就读啥
+            //<!>Scanner的String构造参数时source，不是path，给啥就读啥
             Scanner in = new Scanner(Paths.get("C:\\Users\\name\\IdeaProjects\\LearningJava\\src\\qiuchi\\chen\\innerclass\\AnonymousInnerClass.java"));
             PrintWriter writer = new PrintWriter("C:\\Users\\name\\Desktop\\test.txt");
             while (in.hasNextLine()) {
@@ -56,7 +56,7 @@ public class SomethingBasic {
         }
         System.out.printf("%8.2f\n", 100.0 / 3);
         System.out.printf("%1$s %2$tB %2$te, %2$tY\n", "Due date:", new java.util.Date());
-        //%{n}${type}可以指对应位置参数
+        //<!>  %{n}${type}可以指对应位置参数
     }
 
     static void AboutBigNumber() {
@@ -106,6 +106,42 @@ public class SomethingBasic {
         }
     }
 
+    private void About_Cloneable() {
+        class ClassCanClone implements Cloneable {
+            //Cloneable不规定方法，只在instanceof时起作用
+            //此类成为:tagging interface
+            @Override
+            protected Object clone() throws CloneNotSupportedException {
+                //但仍需要重写继承自Object的clone方法来符合语义
+                return super.clone();
+            }
+
+        }
+    }
+
+
+    private interface ITestInterface {
+        final int someConstant = 0;
+
+        void doMethod();
+    }
+
+    private static void UseOf_InstanceOf() {
+
+        class AClass implements ITestInterface {
+
+            //接口内能放常量，但不推荐
+            @Override
+            public void doMethod() {
+
+            }
+        }
+        AClass instance = new AClass();
+        int a = instance.someConstant;
+        System.out.println(instance instanceof ITestInterface);
+        //<!>注意在对象为null时候instanceof一定返回false
+    }
+
     /**
      * <strong>Description</strong>
      *
@@ -115,10 +151,9 @@ public class SomethingBasic {
      *             subdirectory of the directory containing the source file, named doc-files. The
      *             javadoc utility will copy the doc-files directories and their contents from the
      *             source directory to the documentation directory. You need to use the docfiles directory in your link,
-     *             for example <img src="doc-files/uml.png"
-     *             alt="UML diagram"/>.
+     *             for example <img src="doc-files/uml.png"alt="UML diagram"/>.
      */
     public static void main(String[] args) {
-        Size a = Size.EXTRA_LARGE;
+        UseOf_InstanceOf();
     }
 }

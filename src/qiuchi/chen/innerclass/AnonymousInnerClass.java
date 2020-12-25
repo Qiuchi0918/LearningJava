@@ -5,7 +5,7 @@ interface ISomeInterface {
 }
 
 abstract class AbClass {
-    private int mem;
+    public int mem;
 
     public AbClass() {
     }
@@ -49,13 +49,19 @@ public class AnonymousInnerClass {
         AnonymousInnerClass outer = new AnonymousInnerClass();
         ISomeInterface anoInner = outer.Get(1);
         //虚类也可以用跟匿名类相似的方法声明并顺便创建实例
+        AbClass abClass = new AbClass() {
+            @Override
+            public int He() {
+                return super.He();
+            }
+        };
         for (int[] i = {0}; i[0] < 5; i[0]++) {
             AbClass a = new AbClass() {
                 {
                     System.out.println("Born");
-                    i[0]++;
-                    //<?>为什么必须要final？
+                    //为什么必须要final？
                     //为什么引用类型不用final也行
+                    //能传值不能改
                     //corejava p281
                 }
 

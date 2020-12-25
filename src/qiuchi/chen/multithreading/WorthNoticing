@@ -1,0 +1,20 @@
+Run() and Start():
+    Do not call the run method of the Thread class or the Runnable object.
+    Calling the run method directly merely executes the task in the same
+    thread—no new thread is started. Instead, call the Thread.start
+    method. It will create a new thread that executes the run method.
+
+isInterrupted():
+    The isInterrupted check is neither necessary nor useful if you call the sleep
+    method (or another interruptible method) after every work iteration. If you call
+    the sleep method when the interrupted status is set, it doesn’t sleep. Instead, it
+    clears the status (!) and throws an InterruptedException. Therefore, if your loop
+    calls sleep, don’t check the interrupted status. Instead, catch the InterruptedException
+
+core java e9 pdf p677 Thread states
+
+The "synchronized"
+    Ever since version 1.0,
+    every object in Java has an intrinsic lock. If a method is declared with the
+    synchronized keyword, the object’s lock protects the entire method. That is, to
+    call the method, a thread must acquire the intrinsic object lock.

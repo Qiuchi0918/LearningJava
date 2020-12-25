@@ -1,0 +1,35 @@
+There are two kinds of exceptions: unchecked exceptions and checked exceptions. With checked
+exceptions, the compiler checks that you provide a handler. However, many common exceptions, such as
+accessing a null reference, are unchecked. The compiler does not check whether you provided a handler
+for these errors—after all, you should spend your mental energy on avoiding these mistakes rather than
+coding handlers for them.
+
+
+The "Error":
+    The Error hierarchy describes internal errors and resource exhaustion situations inside the Java
+    runtime system. You should not throw an object of this type. There is little you can do if such an
+    internal error occurs, beyond notifying the user and trying to terminate the program gracefully.
+    These situations are quite rare.
+
+"Checked And Unchecked Exception":
+    The Java Language Specification calls any exception that derives from the class Error or the class
+    RuntimeException an unchecked exception. All other exceptions are called checked exceptions. This is
+    useful terminology that we also adopt. The compiler checks that you provide exception handlers for
+    all checked exceptions.
+
+
+The "Exception":
+    Exceptions that inherit from RuntimeException include such problems as
+    • A bad cast
+    • An out-of-bounds array access
+    • A null pointer access
+    Exceptions that do not inherit from RuntimeException include
+    • Trying to read past the end of a file
+    • Trying to open a file that doesn’t exist
+    • Trying to find a Class object for a string that does not denote an existing class
+
+Don't Throw Checked Exception When SuperClass Doesn't:
+    If you are writing a method that overrides a superclass method which throws no exceptions (such as
+    paintComponent in JComponent), then you must catch each checked exception in the method’s code.
+    You are not allowed to add more throws specifiers to a subclass method than are present in the
+    superclass method.

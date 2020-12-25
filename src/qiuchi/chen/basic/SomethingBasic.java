@@ -13,7 +13,7 @@ public class SomethingBasic {
         //<!>注意下String pool这个概念
         String a = "123", b = "123";
         System.out.println(a == b);
-        //<?>返回true，自动指向已有string？
+        //返回true，自动指向已有String
         System.out.println(b == "123");
     }
 
@@ -51,12 +51,16 @@ public class SomethingBasic {
 
             @Override
             public void formatTo(Formatter formatter, int flags, int width, int precision) {
-                //<?>这个咋用
+
             }
         }
         System.out.printf("%8.2f\n", 100.0 / 3);
         System.out.printf("%1$s %2$tB %2$te, %2$tY\n", "Due date:", new java.util.Date());
         //<!>  %{n}${type}可以指对应位置参数
+
+        cls printObject = new cls();
+        Formatter formatter = new Formatter();
+        formatter.format("%s", printObject);
     }
 
     static void AboutBigNumber() {

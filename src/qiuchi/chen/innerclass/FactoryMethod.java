@@ -18,14 +18,14 @@ class Implementation implements IService {
     }
 
     public static IServiceFactory getFactory() {
-        //return () -> new Implementation();
-        //<?>这是咋整的?因为接口只有一个方法么
-        return new IServiceFactory() {
-            @Override
-            public IService getService() {
-                return new Implementation();
-            }
-        };
+        return () -> new Implementation();
+        //<->这是咋整的?因为接口只有一个方法么：单方法接口
+        //return new IServiceFactory() {
+        //    @Override
+        //    public IService getService() {
+        //        return new Implementation();
+        //    }
+        //};
     }
 }
 

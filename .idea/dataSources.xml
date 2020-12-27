@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="Apache Derby (Remote) - COREJAVA@localhost" uuid="e6786aef-be5b-4906-a6a4-45e44f097ee0">
+      <driver-ref>derby.remote</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.apache.derby.client.ClientAutoloadedDriver</jdbc-driver>
+      <jdbc-url>jdbc:derby://localhost:1527/COREJAVA</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

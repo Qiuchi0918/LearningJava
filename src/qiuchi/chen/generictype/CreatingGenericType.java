@@ -2,6 +2,10 @@ package qiuchi.chen.generictype;
 
 import java.io.Serializable;
 
+interface IGenericInterface<T> {
+    T get();//泛型接口
+}
+
 class Pair<T> {
     private T first;
     private T second;

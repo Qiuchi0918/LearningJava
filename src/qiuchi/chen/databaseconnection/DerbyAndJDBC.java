@@ -3,10 +3,7 @@ package qiuchi.chen.databaseconnection;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -76,5 +73,14 @@ class DerbyAndJDBC {
         cachedRowSet.setString(1, "SomeTableName");
         cachedRowSet.setPageSize(10);
         cachedRowSet.nextPage();
+    }
+
+    private static void AboutMetaData() throws SQLException {
+        Connection conn = getConnection("");
+        DatabaseMetaData metaData = conn.getMetaData();
+        ResultSet resultSet = null;
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        resultSetMetaData.getColumnLabel(1);
+        resultSetMetaData.getColumnName(1);
     }
 }

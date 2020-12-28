@@ -10,5 +10,7 @@ class Collection {
         arrLst.listIterator().add(1);
         HashSet<Integer> set = new HashSet<>();
         set.iterator();//无序所以没有listIterator
+        String someString = new String();
+        someString.split("\\PL");
     }
 }

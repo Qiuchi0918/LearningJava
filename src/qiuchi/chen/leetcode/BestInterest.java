@@ -338,17 +338,32 @@ class Solution {
         for (int i = 0; i < nums.length; ++i) {
             int curTarget = target - nums[i];
 
-            for (int j = 0; j < nums.length - 1; j++) {
-                if (j == i) continue;
-                for (int k = j + 1; k < nums.length; k++) {
-                    if (k == i) continue;
-                    int curResult = nums[j] + nums[k];
+            int lPtr = 0, rPtr = nums.length - 1;
+            while (lPtr != rPtr) {
+                if (lPtr == i) {
+                    lPtr++;
+                    continue;
                 }
+                if (rPtr == i) {
+                    rPtr--;
+                    continue;
+                }
+
+                int curSum = nums[rPtr] + nums[lPtr];
+                int curDifference = curSum - curTarget;
+                if (Math.abs(curDifference) < Math.abs(difference)) {
+                    difference = curDifference;
+                }
+                if (curDifference == 0) return target + difference;
+                else if (curDifference < 0) lPtr++;
+                else rPtr--;
             }
         }
+        return target + difference;
     }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
+        solution.threeSumClosest(new int[]{-1, 2, 1, -4}, 1);
     }
 }

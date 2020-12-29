@@ -3,10 +3,8 @@ package qiuchi.chen.leetcode;
 import org.apache.derby.shared.common.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.StringReader;
+import java.util.*;
 
 class ListNode {
     int val;
@@ -51,7 +49,7 @@ class Solution {
         return bestProfit;
     }
 
-    public int[] twoSum(int @NotNull [] nums, int target) {
+    public int[] twoSum(int[] nums, int target) {
         int[] result = null;
         HashMap<Integer, Integer> hashMap = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
@@ -135,25 +133,33 @@ class Solution {
     }
 
     public String longestPalindrome(String s) {
-        int n = s.length();
-        boolean[][] dp = new boolean[n][n];
-        String ans = "";
-        for (int l = 0; l < n; ++l) {
-            for (int i = 0; i + l < n; ++i) {
-                int j = i + l;
-                if (l == 0) {
-                    dp[i][j] = true;
-                } else if (l == 1) {
-                    dp[i][j] = (s.charAt(i) == s.charAt(j));
-                } else {
-                    dp[i][j] = (s.charAt(i) == s.charAt(j) && dp[i + 1][j - 1]);
-                }
-                if (dp[i][j] && l + 1 > ans.length()) {
-                    ans = s.substring(i, i + l + 1);
+        int length = s.length();
+        boolean[][] dp = new boolean[length][length];
+
+        for (int i = 0; i < length - 1; i++) {
+            dp[i][i + 1] = s.charAt(i) == s.charAt(i + 1);
+        }
+        for (int i = 0; i < length; i++) {
+            dp[i][i] = true;
+        }
+
+        for (int j = 2; j < length; j++) {
+            for (int i = 0; i < j - 1; i++) {
+                dp[i][j] = s.charAt(i) == s.charAt(j) && dp[i + 1][j - 1];
+            }
+        }
+
+        int start = 0, end = 0, longest = 0;
+        for (int i = 0; i < length; i++) {
+            for (int j = i; j < length; j++) {
+                if (dp[i][j] && j - i + 1 > longest) {
+                    longest = j - i + 1;
+                    start = i;
+                    end = j;
                 }
             }
         }
-        return ans;
+        return s.substring(start, end + 1);
     }
 
     public int minDistance(String word1, String word2) {
@@ -182,8 +188,167 @@ class Solution {
         return dp[word1.length()][word2.length()];
     }
 
+    public String convert(String s, int numRows) {
+        if (numRows == 1) {
+            return s;
+        }
+
+
+        int cycle = numRows * 2 - 2;
+        StringBuilder[] stringBuilders = new StringBuilder[numRows];
+        for (int i = 0; i < numRows; i++) {
+            stringBuilders[i] = new StringBuilder();
+        }
+        for (int i = 0; i < s.length(); i++) {
+            int posParam = i % cycle;
+            if (posParam < numRows) {
+                stringBuilders[posParam].append(s.charAt(i));
+            } else {
+                stringBuilders[cycle - posParam].append(s.charAt(i));
+            }
+        }
+        String result = "";
+        for (int i = 0; i < numRows; i++) {
+            result += stringBuilders[i].toString();
+        }
+        return result;
+    }
+
+    public int reverse(int x) {
+        int sign = 1;
+        String num = String.valueOf(x);
+        if (num.charAt(0) == '-') {
+            sign = -1;
+            num = num.substring(1, num.length());
+        }
+        num = num.transform(s -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = s.length() - 1; i >= 0; i--) {
+                stringBuilder.append(s.charAt(i));
+            }
+            return stringBuilder.toString();
+        });
+        long lResult = Long.parseLong(num);
+        if (Integer.MAX_VALUE < lResult)
+            return 0;
+        else return sign * Integer.parseInt(num);
+    }
+
+    public boolean isPalindrome(int x) {
+        if (x < 0)
+            return false;
+        String num = String.valueOf(x);
+        for (int i = 0; i < num.length() / 2; i++) {
+            if (num.charAt(i) != num.charAt(num.length() - i - 1))
+                return false;
+        }
+        return true;
+    }
+
+    public int maxArea(int[] height) {
+        if (height.length < 2)
+            return 0;
+        int lPos = 0, rPos = height.length - 1;
+        int best = 0;
+
+        do {
+            best = Math.max(best, Math.min(height[lPos], height[rPos]) * (rPos - lPos));
+            if (height[lPos] > height[rPos])
+                --rPos;
+            else
+                ++lPos;
+        } while (lPos != rPos);
+        return best;
+    }
+
+    public String intToRoman(int num) {
+        String[] combination = new String[]{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] value = new int[]{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 13; i++) {
+            while (num / value[i] != 0) {
+                stringBuilder.append(combination[i]);
+                num -= value[i];
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    public int romanToInt(String s) {
+        String[] combination = new String[]{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int[] value = new int[]{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        int result = 0;
+        for (int i = 0; i < 13; i++) {
+            int curUnitValue = value[i];
+            String curUnit = combination[i];
+            int curUnitLength = curUnit.length();
+            while (s.length() >= curUnitLength && s.substring(0, curUnitLength).equals(curUnit)) {
+                s = s.substring(curUnitLength);
+                result += value[i];
+            }
+        }
+        return result;
+    }
+
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        HashSet<Integer> numsNoDuplicate = new HashSet<>();
+        HashMap<Integer, Integer> intCount = new HashMap<>();
+
+        for (int num : nums) {
+            if (intCount.containsKey(num)) {
+                intCount.put(num, intCount.get(num) + 1);
+            } else {
+                intCount.put(num, 1);
+            }
+            numsNoDuplicate.add(num);
+        }
+        HashMap<String, Integer[]> result = new HashMap<>();
+        for (int seed : numsNoDuplicate) {
+            for (Integer second : numsNoDuplicate) {
+                if (numsNoDuplicate.contains(-seed - second)) {
+                    Integer[] curResult = new Integer[]{seed, second, -seed - second};
+                    Arrays.sort(curResult);
+                    for (int i = 0; i < 3; i++) {
+                        int curIntCount = intCount.get(curResult[i]);
+                        int realCount = 0;
+                        for (int j = 0; j < 3; j++) {
+                            if (curResult[j].equals(curResult[i]))
+                                realCount++;
+                        }
+                        if (realCount <= curIntCount)
+                            result.put(Arrays.toString(curResult), curResult);
+                    }
+                }
+            }
+        }
+        List<List<Integer>> resultList = new ArrayList<>();
+        for (Integer[] sets : result.values()) {
+            resultList.add(new ArrayList<Integer>(Arrays.asList(sets)));
+        }
+        return resultList;
+    }
+
+    public int threeSumClosest(int[] nums, int target) {
+        //给定一个包括n个整数的数组nums和一个目标值target。找出nums中的三个整数，
+        //使得它们的和与target最接近。返回这三个数的和。假定每组输入只存在唯一答案。
+        Arrays.sort(nums);
+        int[] result = new int[2];
+        int difference = Integer.MAX_VALUE;
+        for (int i = 0; i < nums.length; ++i) {
+            int curTarget = target - nums[i];
+
+            for (int j = 0; j < nums.length - 1; j++) {
+                if (j == i) continue;
+                for (int k = j + 1; k < nums.length; k++) {
+                    if (k == i) continue;
+                    int curResult = nums[j] + nums[k];
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         Solution solution = new Solution();
-        solution.minDistance("horse", "ros");
     }
 }

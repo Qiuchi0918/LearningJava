@@ -362,8 +362,329 @@ class Solution {
         return target + difference;
     }
 
+    public List<String> letterCombinations(String digits) {
+        if (digits.length() == 0) return new ArrayList<>();
+        int[] digitCodePointArr = new int[digits.length()];
+        for (int i = 0; i < digits.length(); i++) {
+            digitCodePointArr[i] = digits.codePointAt(i) - 50;//0-7
+        }
+        final ArrayList<String> digitCodePointArrLst = new ArrayList<>();
+        class Operator {
+            final int[] cpArr = digitCodePointArr;
+
+            void op(String curString, int curPos) {
+                if (curPos == cpArr.length) {
+                    digitCodePointArrLst.add(curString);
+                } else {
+                    if (cpArr[curPos] < 5) {
+                        for (int i = 0; i < 3; i++) {
+                            int curCpValue = cpArr[curPos] * 3 + i + 97;
+                            op(curString + Character.toString(curCpValue), curPos + 1);
+                        }
+                    } else if (cpArr[curPos] == 5) {
+                        for (int i = 0; i < 4; i++) {
+                            int curCpValue = cpArr[curPos] * 3 + i + 97;
+                            op(curString + Character.toString(curCpValue), curPos + 1);
+                        }
+                    } else if (cpArr[curPos] == 6) {
+                        for (int i = 0; i < 3; i++) {
+                            int curCpValue = cpArr[curPos] * 3 + 1 + i + 97;
+                            op(curString + Character.toString(curCpValue), curPos + 1);
+                        }
+                    } else {
+                        for (int i = 0; i < 4; i++) {
+                            int curCpValue = cpArr[curPos] * 3 + 1 + i + 97;
+                            op(curString + Character.toString(curCpValue), curPos + 1);
+                        }
+                    }
+                }
+            }
+        }
+        Operator oper = new Operator();
+        oper.op("", 0);
+        return digitCodePointArrLst;
+    }
+
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        //给定一个包含n 个整数的数组nums和一个目标值target，
+        //判断nums中是否存在四个元素 a，b，c和 d，使得a + b + c + d的值与target相等？找出所有满足条件且不重复的四元组。
+        if (nums.length < 4) return new ArrayList<>();
+        List<List<Integer>> result = new ArrayList<>();
+        Arrays.sort(nums);
+        HashSet<String> reachedBase = new HashSet<>();
+        HashSet<String> reachedCombination = new HashSet<>();
+        for (int baseOneIndex = 0; baseOneIndex < nums.length - 1; baseOneIndex++) {
+            for (int baseTwoIndex = baseOneIndex + 1; baseTwoIndex < nums.length; baseTwoIndex++) {
+                int curTarget = target - nums[baseOneIndex] - nums[baseTwoIndex];
+                int[] curBase = new int[]{nums[baseOneIndex], nums[baseTwoIndex]};
+                Arrays.sort(curBase);
+                String curBaseName = Arrays.toString(curBase);
+                if (reachedBase.contains(curBaseName)) continue;
+
+                reachedBase.add(curBaseName);
+                int lPtr = 0, rPtr = nums.length - 1;
+                while (lPtr != rPtr) {
+                    if (lPtr == baseOneIndex || lPtr == baseTwoIndex) {
+                        lPtr++;
+                        continue;
+                    }
+                    if (rPtr == baseTwoIndex || rPtr == baseOneIndex) {
+                        rPtr--;
+                        continue;
+                    }
+
+                    int curSum = nums[rPtr] + nums[lPtr];
+                    int curDifference = curSum - curTarget;
+                    if (curDifference == 0) {
+                        int a = nums[baseOneIndex], b = nums[baseTwoIndex], c = nums[lPtr], d = nums[rPtr];
+                        Integer[] curResultArr = new Integer[]{nums[baseOneIndex], nums[baseTwoIndex], nums[lPtr], nums[rPtr]};
+                        Arrays.sort(curResultArr);
+                        String curResultName = Arrays.toString(curResultArr);
+                        if (!reachedCombination.contains(curResultName)) {
+                            reachedCombination.add(curResultName);
+                            result.add(new ArrayList<>(Arrays.asList(curResultArr)));
+                        }
+                        lPtr++;
+                    } else if (curDifference < 0) lPtr++;
+                    else rPtr--;
+                }
+            }
+        }
+        return result;
+    }
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        //给定一个链表，删除链表的倒数第n个节点，并且返回链表的头结点。
+        if (head.next == null) {
+            return null;
+        }
+        ListNode curNode = head;
+        Deque<ListNode> deque = new LinkedList<>();
+        while (curNode != null) {
+            deque.addLast(curNode);
+            if (deque.size() == n + 2) deque.removeFirst();
+            curNode = curNode.next;
+        }
+        Iterator<ListNode> iter;
+        if (deque.size() == n) {
+            iter = deque.iterator();
+            iter.next();
+            return iter.next();
+        } else {
+            iter = deque.iterator();
+            ListNode lConnect = iter.next();
+            iter.next();
+            if (iter.hasNext()) {
+                lConnect.next = iter.next();
+                return head;
+            } else {
+                lConnect.next = null;
+                return head;
+            }
+        }
+    }
+
+    public boolean isValid(String s) {
+        //给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。
+
+        Stack<Character> characterStack = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char curChar = s.charAt(i);
+            if (curChar == '(' || curChar == '{' || curChar == '[') {
+                characterStack.push(curChar);
+            } else {
+                if (characterStack.empty()) return false;
+                char curPeek = characterStack.peek();
+                if (curPeek + 2 == curChar || curPeek + 1 == curChar) {
+                    characterStack.pop();
+                } else return false;
+            }
+        }
+
+        if (characterStack.empty())
+            return true;
+        else
+            return false;
+    }
+
+    public List<String> generateParenthesis(int n) {
+        if (n == 0) return new ArrayList<>();
+        HashSet<String> singletonCheck = new HashSet<>();
+        List<String> result = new ArrayList<>();
+        class RecurOp {
+            void run(boolean[] avalIndex, int timeRemain, char[] curResult) {
+                if (timeRemain == 0) {
+                    String resString = String.valueOf(curResult);
+                    if (singletonCheck.add(resString)) {
+                        result.add(resString);
+                    }
+                    return;
+                }
+                for (int i = 0; i < avalIndex.length - 1; i++) {
+                    if (avalIndex[i]) continue;
+                    for (int j = i + 1; j < avalIndex.length; j++) {
+                        if (avalIndex[j]) continue;
+                        boolean[] curAvalIndexPassOn = Arrays.copyOf(avalIndex, avalIndex.length);
+                        char[] curResPassOn = Arrays.copyOf(curResult, curResult.length);
+                        curAvalIndexPassOn[i] = true;
+                        curAvalIndexPassOn[j] = true;
+                        curResPassOn[i] = '(';
+                        curResPassOn[j] = ')';
+                        run(curAvalIndexPassOn, timeRemain - 1, curResPassOn);
+                    }
+                }
+            }
+        }
+        RecurOp op = new RecurOp();
+        op.run(new boolean[n * 2], n, new char[n * 2]);
+        return result;
+    }
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        //给你一个链表数组，每个链表都已经按升序排列。
+        //请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+        Queue<ListNode> queue = new ArrayDeque<>();
+        while (true) {
+            boolean exit = true;
+            for (int i = 0; i < lists.length; i++) {
+                if (lists[i] != null) exit = false;
+            }
+            if (exit) break;
+
+            int curMinValue = Integer.MAX_VALUE, curMinIndex = 0;
+            for (int i = 0; i < lists.length; i++) {
+                if (lists[i] != null) {
+                    if (lists[i].val < curMinValue) {
+                        curMinValue = lists[i].val;
+                        curMinIndex = i;
+                    }
+                }
+            }
+            queue.add(lists[curMinIndex]);
+            lists[curMinIndex] = lists[curMinIndex].next;
+        }
+        ListNode lresult = new ListNode(), curNode = lresult;
+        while (!queue.isEmpty()) {
+            curNode.next = queue.poll();
+            curNode = curNode.next;
+        }
+        return lresult.next;
+    }
+
+    public ListNode swapPairs(ListNode head) {
+        ListNode leftToResult = new ListNode();
+        ListNode resPtr = leftToResult;
+        ListNode curNode = head;
+        Stack<ListNode> reverseStack = new Stack<>();
+        while (curNode != null) {
+            for (int i = 0; i < 2; i++) {
+                if (curNode != null) {
+                    reverseStack.add(curNode);
+                    curNode = curNode.next;
+                }
+            }
+            while (!reverseStack.isEmpty()) {
+                resPtr.next = reverseStack.pop();
+                resPtr = resPtr.next;
+            }
+        }
+        resPtr.next = null;
+        return leftToResult.next;
+    }
+
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode leftToResult = new ListNode();
+        ListNode resPtr = leftToResult;
+        ListNode curNode = head;
+        Stack<ListNode> reverseStack = new Stack<>();
+        while (curNode != null) {
+            boolean stackFull = false;
+            for (int i = 0; i < k; i++) {
+                if (curNode != null) {
+                    if (i == k - 1) stackFull = true;
+                    reverseStack.add(curNode);
+                    curNode = curNode.next;
+                }
+            }
+            if (stackFull) {
+                while (!reverseStack.isEmpty()) {
+                    resPtr.next = reverseStack.pop();
+                    resPtr = resPtr.next;
+                }
+            } else {
+                Stack<ListNode> defaultStack = new Stack<>();
+                while (!reverseStack.isEmpty()) {
+                    defaultStack.add(reverseStack.pop());
+                }
+                while (!defaultStack.isEmpty()) {
+                    resPtr.next = defaultStack.pop();
+                    resPtr = resPtr.next;
+                }
+            }
+        }
+        resPtr.next = null;
+        return leftToResult.next;
+    }
+
+    public int removeDuplicates(int[] nums) {
+        //给定一个排序数组，你需要在原地删除重复出现的元素，使得每个元素只出现一次，返回移除后数组的新长度。
+        //不要使用额外的数组空间，你必须在原地修改输入数组，并在使用 O(1) 额外空间的条件下完成。
+        int writePtr = 0, readIndex = 0, lastDigitWrite = Integer.MIN_VALUE;
+        while (readIndex != nums.length) {
+            if (nums[readIndex] != lastDigitWrite) {
+                nums[writePtr] = nums[readIndex];
+                ++writePtr;
+                lastDigitWrite = nums[readIndex];
+            }
+            ++readIndex;
+        }
+        return writePtr;
+    }
+
+    public int removeElement(int[] nums, int val) {
+        //给你一个数组 nums和一个值 val，你需要 原地 移除所有数值等于val的元素，并返回移除后数组的新长度。
+        //不要使用额外的数组空间，你必须仅使用 O(1) 额外空间并 原地 修改输入数组。
+        //元素的顺序可以改变。你不需要考虑数组中超出新长度后面的元素。
+        int writePtr = 0, readIndex = 0;
+        while (readIndex != nums.length) {
+            if (nums[readIndex] != val) {
+                nums[writePtr] = nums[readIndex];
+                ++writePtr;
+            }
+            ++readIndex;
+        }
+        return writePtr;
+    }
+
+    public int divide(int dividend, int divisor) {
+        //给定两个整数，被除数dividend和除数divisor。将两数相除，要求不使用乘法、除法和 mod 运算符。
+        //返回被除数dividend除以除数divisor得到的商。
+        //整数除法的结果应当截去（truncate）其小数部分，例如：truncate(8.345) = 8 以及 truncate(-2.7335) = -2
+        if (dividend == 0) return 0;
+        int dividendTemp = dividend, divisorTemp = divisor;
+
+        dividendTemp = Math.abs(dividend);
+        divisorTemp = Math.abs(divisor);
+        int curValue = divisorTemp, count = 0;
+        while (dividendTemp > curValue) {
+            count++;
+            curValue += divisorTemp;
+        }
+        if (dividend < 0 && divisor > 0) return -count;
+        if (dividend > 0 && divisor > 0) return count;
+        if (dividend < 0 && divisor < 0) return count;
+        if (dividend > 0 && divisor < 0) return -count;
+        return 0;
+    }
+
+    //public List<Integer> findSubstring(String s, String[] words) {
+    //    //给定一个字符串s和一些长度相同的单词words。找出 s 中恰好可以由words 中所有单词串联形成的子串的起始位置。
+    //    //注意子串要与words 中的单词完全匹配，中间不能有其他字符，但不需要考虑words中单词串联的顺序。
+    //}
+
     public static void main(String[] args) {
         Solution solution = new Solution();
-        solution.threeSumClosest(new int[]{-1, 2, 1, -4}, 1);
+        solution.divide(1, 1);
     }
 }

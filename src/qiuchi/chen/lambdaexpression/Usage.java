@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
@@ -32,7 +33,6 @@ public class Usage {
             return first.length() - second.length();
         });
         Arrays.sort(args, (first, second) -> first.length() - second.length());
-
 
         Arrays.sort(objArr, Comparator.comparingInt(value -> value.getSomeInteger()));
         Arrays.sort(objArr, Comparator.comparingInt(Obj::getSomeInteger));

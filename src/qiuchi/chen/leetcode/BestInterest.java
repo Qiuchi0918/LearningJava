@@ -661,30 +661,164 @@ class Solution {
         //给定两个整数，被除数dividend和除数divisor。将两数相除，要求不使用乘法、除法和 mod 运算符。
         //返回被除数dividend除以除数divisor得到的商。
         //整数除法的结果应当截去（truncate）其小数部分，例如：truncate(8.345) = 8 以及 truncate(-2.7335) = -2
-        if (dividend == 0) return 0;
-        int dividendTemp = dividend, divisorTemp = divisor;
-
-        dividendTemp = Math.abs(dividend);
-        divisorTemp = Math.abs(divisor);
-        int curValue = divisorTemp, count = 0;
-        while (dividendTemp > curValue) {
-            count++;
-            curValue += divisorTemp;
+        long absDividend, absDivisor;
+        absDividend = Math.abs(dividend);
+        absDivisor = Math.abs(divisor);
+        if (dividend == Integer.MIN_VALUE) {
+            absDividend = Integer.MAX_VALUE;
+            ++absDividend;
         }
-        if (dividend < 0 && divisor > 0) return -count;
-        if (dividend > 0 && divisor > 0) return count;
-        if (dividend < 0 && divisor < 0) return count;
-        if (dividend > 0 && divisor < 0) return -count;
-        return 0;
+        if (divisor == Integer.MIN_VALUE) {
+            absDivisor = Integer.MAX_VALUE;
+            ++absDivisor;
+        }
+        long result = 0;
+        do {
+            absDividend -= absDivisor;
+            if (absDividend >= 0) {
+                ++result;
+            } else break;
+        } while (true);
+        if (result > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if (-result < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+
+        int res = (int) result;
+
+        if (dividend < 0 && divisor > 0) return -res;
+        else if (dividend > 0 && divisor > 0) return res;
+        else if (dividend < 0 && divisor < 0) return res;
+        else return -res;
     }
 
-    //public List<Integer> findSubstring(String s, String[] words) {
-    //    //给定一个字符串s和一些长度相同的单词words。找出 s 中恰好可以由words 中所有单词串联形成的子串的起始位置。
-    //    //注意子串要与words 中的单词完全匹配，中间不能有其他字符，但不需要考虑words中单词串联的顺序。
-    //}
+    public void nextPermutation(int[] nums) {
+        for (int curHeadIndex = nums.length - 2; curHeadIndex >= 0; --curHeadIndex) {
+            int curHeadValue = nums[curHeadIndex], minValueNextToHead = Integer.MAX_VALUE, minNextToHeadIndex = nums.length - 1;
+            for (int j = nums.length - 1; j > curHeadIndex; --j) {
+                int curValue = nums[j];
+                if (curValue > curHeadValue && curValue < minValueNextToHead) {
+                    minValueNextToHead = curValue;
+                    minNextToHeadIndex = j;
+                }
+            }
+            if (minValueNextToHead != Integer.MAX_VALUE) {
+                int temp = nums[curHeadIndex];
+                nums[curHeadIndex] = nums[minNextToHeadIndex];
+                nums[minNextToHeadIndex] = temp;
+                Arrays.sort(nums, curHeadIndex + 1, nums.length);
+                return;
+            }
+        }
+        Arrays.sort(nums);
+    }
+
+    public int search(int[] nums, int target) {
+        //升序排列的整数数组 nums 在预先未知的某个点上进行了旋转
+        //（例如， [0,1,2,4,5,6,7] 经旋转后可能变为[4,5,6,7,0,1,2] ）。
+        //请你在数组中搜索target ，如果数组中存在这个目标值，则返回它的索引，否则返回-1。
+        int lLimit = 0, rLimit = nums.length - 1, center = (rLimit + lLimit) / 2, lastCentreValue = nums[center];
+        while (nums[center] != target) {
+            if (rLimit - lLimit < 3)
+                break;
+            if (nums[center] > nums[rLimit]) {
+                if (nums[center] < target) {
+                    lLimit = center;
+                } else {
+                    if (nums[lLimit] < target) rLimit = center;
+                    else lLimit = center;
+                }
+            } else {
+                if (nums[center] < target) {
+                    if (nums[rLimit] > target) lLimit = center;
+                    else rLimit = center;
+                } else rLimit = center;
+            }
+            center = (lLimit + rLimit) / 2;
+        }
+        for (int i = lLimit; i <= rLimit; i++) {
+            if (nums[i] == target)
+                return i;
+        }
+        return -1;
+    }
+
+    public int[] searchRange(int[] nums, int target) {
+        //给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
+        //如果数组中不存在目标值 target，返回[-1, -1]。
+        if (nums.length == 0) return new int[]{-1, -1};
+        int lLimit = 0, rLimit = nums.length - 1, center = (rLimit + lLimit) / 2, lastCentreValue = nums[center];
+        while (nums[center] != target) {
+            if (rLimit - lLimit < 3)
+                break;
+
+            if (nums[center] < target)
+                lLimit = center;
+            else rLimit = center;
+
+            center = (lLimit + rLimit) / 2;
+        }
+        center = Integer.MAX_VALUE;
+        for (int i = lLimit; i <= rLimit; i++) {
+            if (nums[i] == target)
+                center = i;
+        }
+        if (center == Integer.MAX_VALUE) return new int[]{-1, -1};
+
+        int lSpan = 0, rSpan = 0;
+        while (center - lSpan - 1 != -1) {
+            if (nums[center - lSpan - 1] == target) {
+                ++lSpan;
+            } else break;
+        }
+        if (center != nums.length - 1)
+            while (center + rSpan + 1 != nums.length) {
+                if (nums[center + rSpan + 1] == target) {
+                    ++rSpan;
+                } else break;
+            }
+        return new int[]{center - lSpan, center + rSpan};
+    }
+
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        //给定一个无重复元素的数组candidates和一个目标数target，
+        //找出candidates中所有可以使数字和为target的组合。
+        //candidates中的数字可以无限制重复被选取。
+        HashSet<String> noRepeatCheck = new HashSet<>();
+        HashSet<String> singleCheck = new HashSet<>();
+        List<List<Integer>> result = new ArrayList<>();
+        class RecurOp {
+            void run(int[] candi, int target, Integer[] curResult) {
+                for (int candidate : candidates) {
+                    if (target - candidate > 0) {
+                        Integer[] passOn = Arrays.copyOf(curResult, curResult.length + 1);
+                        passOn[curResult.length] = candidate;
+
+                        Arrays.sort(passOn);
+                        if (noRepeatCheck.add(Arrays.toString(passOn)))
+                            run(candidates, target - candidate, passOn);
+                    }
+                    if (target - candidate == 0) {
+                        Integer[] resultArr = Arrays.copyOf(curResult, curResult.length + 1);
+                        resultArr[curResult.length] = candidate;
+                        Arrays.sort(resultArr);
+                        if (singleCheck.add(Arrays.toString(resultArr)))
+                            result.add(Arrays.asList(resultArr));
+                    }
+                }
+            }
+        }
+        RecurOp op = new RecurOp();
+        op.run(candidates, target, new Integer[0]);
+        return result;
+    }
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        //给定一个数组candidates和一个目标数target，找出candidates中所有可以使数字和为target的组合。
+        //candidates中的每个数字在每个组合中只能使用一次。
+        return new ArrayList<>();
+    }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
-        solution.divide(1, 1);
+        System.out.println(solution.combinationSum(new int[]{2, 3, 6, 7}, 7));
     }
 }

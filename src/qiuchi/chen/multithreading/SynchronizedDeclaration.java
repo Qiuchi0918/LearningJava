@@ -11,7 +11,7 @@ class SynchronizedDeclaration {
     public static void main(String[] args) {
         SynchronizedDeclaration declaration = new SynchronizedDeclaration();
         for (int i = 0; i < 10; i++) {
-            (new Thread(new Runnable() {
+            (new Thread() {
                 @Override
                 public void run() {
                     try {
@@ -20,7 +20,7 @@ class SynchronizedDeclaration {
                         exception.printStackTrace();
                     }
                 }
-            })).start();
+            }).start();
         }
     }
 }

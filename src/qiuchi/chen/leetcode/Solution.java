@@ -4,7 +4,14 @@ import org.apache.derby.shared.common.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.StringReader;
+import java.lang.reflect.InvocationHandler;
 import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 class ListNode {
     int val;
@@ -23,8 +30,28 @@ class ListNode {
     }
 }
 
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+
+    TreeNode() {
+    }
+
+    TreeNode(int val) {
+        this.val = val;
+    }
+
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
 
 class Solution {
+
     private int bestProfit = 0;
 
     private void bestProfitFunc(int remainingTime, int curBalance, int[] prices) {
@@ -811,14 +838,620 @@ class Solution {
         return result;
     }
 
-    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-        //给定一个数组candidates和一个目标数target，找出candidates中所有可以使数字和为target的组合。
-        //candidates中的每个数字在每个组合中只能使用一次。
-        return new ArrayList<>();
+    public boolean isPowerOfTwo(int n) {
+        double a = Math.log(n) / Math.log(2);
+        return (a - (long) a) == 0;
     }
 
     public static void main(String[] args) {
         Solution solution = new Solution();
         System.out.println(solution.combinationSum(new int[]{2, 3, 6, 7}, 7));
+    }
+}
+
+class CombinationSum2 {
+
+//    HashSet<int[]> result = new HashSet<>();
+//
+//    HashSet<int[]> current = new HashSet<>();
+//
+//    HashMap<int[], int[]> currentMap = new HashMap<>();
+//
+//    int target;
+//
+//    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+//
+//        int[] sortedDistinct = Arrays.stream(candidates).distinct().sorted().toArray();
+//
+//        for (int each :
+//                sortedDistinct) {
+//
+//        }
+//
+//        return null;
+//    }
+//
+//    private void recur() {
+//
+//        boolean conti = false;
+//
+//        Set<int[]> old = currentMap.keySet();
+//
+//
+//        for (int[] each : old) {
+//
+//            int preSum = Arrays.stream(each).sum();
+//
+//            int[] remainStartPoint = Arrays.stream(currentMap.get(each)).distinct().toArray();
+//
+//            for (int startInt : remainStartPoint) {
+//
+//                int curSum = preSum + startInt;
+//
+//                if (curSum < target) {
+//                    conti = true;
+//                }
+//                if (curSum == target){
+//                    curResult=
+//                    result.add(Arrays.copyOf(each, old.size()+1))
+//                }
+//
+//            }
+//
+//        }
+//    }
+}
+
+class MyPow {
+    public double myPow(double x, int n) {
+        return Math.pow(x, n);
+    }
+}
+
+class SolveNQueens {
+
+    public static void main(String[] args) {
+        SolveNQueens solveNQueens = new SolveNQueens();
+        solveNQueens.solveNQueens(4);
+        System.out.println();
+    }
+
+    List<List<int[]>> result = new ArrayList<>();
+
+    public List<List<String>> solveNQueens(int n) {
+
+        ss(0, n, 0, new ArrayList<>());
+
+        return null;
+
+    }
+
+    private void ss(int available, int size, int curCol, List<int[]> prev) {
+
+        for (int curRow = 0; curRow < size; curRow++) {
+
+            int test = generatePointIndicator(size, curRow, curCol) & available;
+
+            if (test != 0) {
+                continue;
+            }
+
+            List<int[]> newPrev = new ArrayList<>(prev);
+
+            newPrev.add(new int[]{curRow, curCol});
+
+            if (curCol == size - 1) {
+                result.add(newPrev);
+            } else {
+                ss(available | generateOccupationBitIndicator(size, curRow, curCol), size, curCol + 1, newPrev);
+            }
+        }
+    }
+
+    private int generatePointIndicator(int size, int row, int col) {
+        return 1 << (row * size + col);
+    }
+
+    private int generateOccupationBitIndicator(int size, int row, int col) {
+        HashSet<int[]> markAsUnavailablePoint = new HashSet<>();
+
+        for (int curRow = 0; curRow < size; curRow++) {
+            if (curRow == row) continue;
+            markAsUnavailablePoint.add(new int[]{col, curRow});
+        }
+        for (int curCol = 0; curCol < size; curCol++) {
+            if (curCol == col) continue;
+            markAsUnavailablePoint.add(new int[]{curCol, row});
+        }
+
+        for (int step = 1; row + step <= size - 1 && col + step <= size - 1; step++) {
+            markAsUnavailablePoint.add(new int[]{row + step, col + step});
+        }
+        for (int step = -1; row + step >= 0 && col + step >= 0; step--) {
+            markAsUnavailablePoint.add(new int[]{row + step, col + step});
+        }
+
+
+        for (int step = 1; row + step <= size - 1 && col - step >= 0; step++) {
+            markAsUnavailablePoint.add(new int[]{row + step, col - step});
+        }
+        for (int step = -1; row + step >= 0 && col - step <= size - 1; step--) {
+            markAsUnavailablePoint.add(new int[]{row + step, col - step});
+        }
+
+        int unavailable = 0;
+
+        for (int[] eachPoint : markAsUnavailablePoint) {
+            int modifier = 1;
+            modifier <<= (eachPoint[0] * size + eachPoint[1]);
+            unavailable |= modifier;
+        }
+        return unavailable;
+    }
+}
+
+class CountPoints {
+
+    public int[] countPoints(int[][] points, int[][] queries) {
+
+        int[] result = new int[queries.length];
+
+        for (int i = 0; i < queries.length; i++) {
+            for (int[] point : points) {
+                if (isInVicinity(point, queries[i][2], queries[i])) {
+                    result[i]++;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    private boolean isInVicinity(int[] targetPoint, int radius, int[] centralPoint) {
+
+        if (Math.abs(centralPoint[0] - targetPoint[0]) > radius || Math.abs(centralPoint[1] - targetPoint[1]) > radius)
+            return false;
+
+        return Math.pow(targetPoint[0] - centralPoint[0], 2) + (Math.pow(targetPoint[1] - centralPoint[1], 2)) <= radius * radius;
+    }
+}
+
+class MinPartitions {
+
+    public static void main(String[] args) {
+        System.out.println(minPartitions("32"));
+    }
+
+    public static int minPartitions(String n) {
+
+        char largest = 48;
+
+        for (int i = 0; i < n.length(); i++) {
+
+            char a = n.charAt(i);
+
+            if (a > largest)
+                largest = a;
+        }
+        return largest - 48;
+    }
+}
+
+class LevelOrder {
+
+    private List<List<Integer>> result = new ArrayList<>();
+
+    public List<List<Integer>> levelOrder(TreeNode root) {
+
+        ArrayList<TreeNode> start = new ArrayList<>();
+        start.add(root);
+
+        if (root == null)
+            return new ArrayList<>();
+
+        recur(start);
+        return result;
+    }
+
+    private void recur(List<TreeNode> curLevel) {
+
+        if (curLevel.size() == 0)
+            return;
+
+        List<TreeNode> newLevel = new ArrayList<>();
+        List<Integer> newResult = new ArrayList<>();
+
+
+        for (TreeNode eachNode : curLevel) {
+
+            newResult.add(eachNode.val);
+
+            if (eachNode.left != null)
+                newLevel.add(eachNode.left);
+            if (eachNode.right != null)
+                newLevel.add(eachNode.right);
+        }
+        result.add(newResult);
+        recur(newLevel);
+    }
+}
+
+/**
+ * 给你两个没有重复元素的数组nums1和nums2，其中nums1是nums2的子集。
+ * 请你找出nums1中每个元素在nums2中的下一个比其大的值。
+ * nums1中数字x的下一个更大元素是指x在nums2中对应位置的右边的第一个比x大的元素。如果不存在，对应位置输出-1。
+ **/
+class NEXT_GREATER_ELEMENT {
+
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < nums2.length; ++i) {
+            map.put(nums2[i], i);
+        }
+
+        for (int i = 0; i < nums1.length; ++i) {
+
+            if (map.get(nums1[i]) == null) {
+                nums1[i] = -1;
+                continue;
+            }
+
+            int startIndex = map.get(nums1[i]) + 1;
+
+            while (startIndex < nums2.length) {
+
+                if (nums2[startIndex] > nums1[i]) {
+                    nums1[i] = nums2[startIndex];
+                    break;
+                }
+
+                ++startIndex;
+            }
+
+            if (startIndex == nums2.length) nums1[i] = -1;
+        }
+
+        return nums1;
+    }
+}
+
+/**
+ * Your Solution object will be instantiated and called as such:
+ * <br>
+ * Solution obj = new Solution(rects);
+ * <br>
+ * int[] param_1 = obj.pick();
+ * <br>
+ * 给定一个非重叠轴对齐矩形的列表 rects，写一个函数 pick 随机均匀地选取矩形覆盖的空间中的整数点。
+ * <br>
+ * 提示：
+ * <br>
+ * 整数点是具有整数坐标的点。
+ * 矩形周边上的点包含在矩形覆盖的空间中。
+ * 第 i 个矩形 rects [i] = [x1，y1，x2，y2]，其中[x1，y1] 是左下角的整数坐标，[x2，y2] 是右上角的整数坐标。
+ * 每个矩形的长度和宽度不超过 2000。
+ * 1 <= rects.length<= 100
+ * pick 以整数坐标数组[p_x, p_y]的形式返回一个点。
+ * pick 最多被调用10000次。
+ */
+class RANDOM_POINT_IN_UN_OVERLAP_RECTANGLE {
+
+    public RANDOM_POINT_IN_UN_OVERLAP_RECTANGLE(int[][] rects) {
+
+    }
+
+    public int[] pick() {
+        return null;
+    }
+}
+
+/**
+ * 给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。
+ */
+class DIAGONAL_ITERATION {
+
+    public static void main(String[] args) {
+        new DIAGONAL_ITERATION().findDiagonalOrder(new int[][]{{2, 5}, {8, 4}, {0, -1}});
+    }
+
+    public int[] findDiagonalOrder(int[][] mat) {
+
+        int rowCount = mat.length;
+        int colCount = mat[0].length;
+
+        int resultIndex = 0;
+
+        int[] result = new int[rowCount * colCount];
+
+        if (mat.length == 1) return mat[0];
+
+        if (mat[0].length == 1) {
+            for (int[] eachArr : mat) {
+                result[resultIndex] = eachArr[0];
+                resultIndex++;
+            }
+            return result;
+        }
+
+        int horizontal = 1;
+        int startIndex = 0;
+
+
+        int maxRowIndex = rowCount - 1;
+        int maxColIndex = colCount - 1;
+
+        while (resultIndex < result.length) {
+
+            if (horizontal == 1) {
+
+                int curRowIndex;
+                int curColIndex;
+
+                if (startIndex < rowCount) {
+
+                    curRowIndex = startIndex;
+                    curColIndex = 0;
+
+                } else {
+
+                    curRowIndex = maxRowIndex;
+                    curColIndex = startIndex - maxRowIndex;
+
+                }
+
+                while (curRowIndex >= 0 && curColIndex < colCount) {
+
+                    result[resultIndex] = mat[curRowIndex][curColIndex];
+
+                    curRowIndex--;
+                    curColIndex++;
+                    resultIndex++;
+                }
+
+            } else {
+
+                int curRowIndex;
+                int curColIndex;
+
+                if (startIndex < colCount) {
+
+                    curRowIndex = 0;
+                    curColIndex = startIndex;
+
+                } else {
+
+                    curRowIndex = startIndex - maxColIndex;
+                    curColIndex = maxColIndex;
+
+                }
+
+                while (curColIndex >= 0 && curRowIndex < rowCount) {
+
+                    result[resultIndex] = mat[curRowIndex][curColIndex];
+
+                    curRowIndex++;
+                    curColIndex--;
+                    resultIndex++;
+                }
+            }
+
+            startIndex++;
+            horizontal *= -1;
+        }
+
+        return result;
+    }
+}
+
+/**
+ * 三个不同的线程 A、B、C 将会共用一个Foo实例。
+ * <br>
+ * 一个将会调用 first() 方法
+ * 一个将会调用second() 方法
+ * 还有一个将会调用 third() 方法
+ * 请设计修改程序，以确保 second() 方法在 first() 方法之后被执行，third() 方法在 second() 方法之后被执行。
+ */
+class Foo {
+
+    public Foo() {
+
+    }
+
+    private volatile int seq = 0;
+
+    public void first(Runnable printFirst) throws InterruptedException {
+
+        // printFirst.run() outputs "first". Do not change or remove this line.
+        printFirst.run();
+
+        seq++;
+    }
+
+    public void second(Runnable printSecond) throws InterruptedException {
+
+        while (seq != 1) {
+            Thread.onSpinWait();
+        }
+
+        // printSecond.run() outputs "second". Do not change or remove this line.
+        printSecond.run();
+
+        seq++;
+    }
+
+    public void third(Runnable printThird) throws InterruptedException {
+
+        while (seq != 2) {
+            Thread.onSpinWait();
+        }
+
+        // printThird.run() outputs "third". Do not change or remove this line.
+        printThird.run();
+    }
+}
+
+/**
+ * 两个不同的线程将会共用一个 FooBar实例。其中一个线程将会调用foo()方法，另一个线程将会调用bar()方法。
+ * <br>
+ * 请设计修改程序，以确保 "foobar" 被输出 n 次。
+ */
+class FooBar {
+
+    private int n;
+
+    private final AtomicBoolean isFoo = new AtomicBoolean(true);
+
+    public FooBar(int n) {
+        this.n = n;
+    }
+
+    public void foo(Runnable printFoo) throws InterruptedException {
+
+        for (int i = 0; i < n; ) {
+
+            if (!isFoo.get()) {
+
+                synchronized (isFoo) {
+                    isFoo.wait();
+                }
+
+            } else {
+                printFoo.run();
+                isFoo.set(false);
+                synchronized (isFoo) {
+                    isFoo.notify();
+                }
+            }
+        }
+    }
+
+    public void bar(Runnable printBar) throws InterruptedException {
+
+        for (int i = 0; i < n; ) {
+
+            if (isFoo.get()) {
+
+                synchronized (isFoo) {
+                    isFoo.wait();
+                }
+
+            } else {
+
+                printBar.run();
+                isFoo.set(true);
+                synchronized (isFoo) {
+                    isFoo.notify();
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 编写一种方法，对字符串数组进行排序，将所有变位词组合在一起。变位词是指字母相同，但排列不同的字符串。
+ */
+class GROUP_ANAGRAMS {
+    public List<List<String>> groupAnagrams(String[] strs) {
+
+        Map<String, List<String>> id_strLst_map = new HashMap<>();
+
+        for (int i = strs.length - 1; i > -1; i--) {
+
+            char[] charArr = strs[i].toCharArray();
+            Arrays.sort(charArr);
+            String id = new String(charArr);
+
+            if (id_strLst_map.containsKey(id)) {
+                id_strLst_map.get(id).add(strs[i]);
+            } else {
+                id_strLst_map.put(id, new ArrayList<>(Collections.singleton(strs[i])));
+            }
+        }
+
+        return new ArrayList<>(id_strLst_map.values());
+    }
+}
+
+/**
+ * 给你两个整数数组arr1 和 arr2，返回使arr1严格递增所需要的最小「操作」数（可能为 0）。
+ * <br>
+ * 每一步「操作」中，你可以分别从 arr1 和 arr2 中各选出一个索引，分别为i 和j，0 <=i < arr1.length和0 <= j < arr2.length，然后进行赋值运算arr1[i] = arr2[j]。
+ * <br>
+ * 如果无法让arr1严格递增，请返回-1。
+ */
+class MAKE_ARRAY_INCREASING {
+    public int makeArrayIncreasing(int[] arr1, int[] arr2) {
+
+        int[] wholeArr = Arrays.copyOf(arr1, arr1.length + arr2.length);
+        System.arraycopy(arr2, 0, wholeArr, arr1.length, arr2.length);
+        Arrays.sort(wholeArr);
+
+        List<int[]> formidable = removeOne(wholeArr, arr1.length);
+
+        formidable = formidable.stream().filter(each -> valid(each, arr1.length)).collect(Collectors.toList());
+
+        int minStep = Integer.MAX_VALUE;
+
+        if (formidable.size() == 0) return -1;
+
+        for (int[] each : formidable) {
+            int step = stepCount(arr1, each);
+            if (step < minStep) minStep = step;
+        }
+
+        return minStep;
+
+    }
+
+    boolean valid(int[] target, int targetLength) {
+
+        if (target.length != targetLength)
+            return false;
+
+        int last = target[0];
+        for (int i = 1; i < target.length; i++) {
+            if (last == target[i]) return false;
+        }
+        return true;
+    }
+
+    int stepCount(int[] src, int[] target) {
+
+        int result = 0;
+
+        for (int i = 0; i < src.length; i++) {
+            if (src[i] != target[i]) result++;
+        }
+
+        return result;
+    }
+
+    List<int[]> removeOne(int[] formidable, int minLength) {
+
+        List<int[]> result = new ArrayList<>();
+
+        result.add(formidable);
+
+        if (formidable.length == minLength) {
+            return result;
+        }
+
+        for (int rmIdx = 0; rmIdx < formidable.length; rmIdx++) {
+            result.addAll(removeOne(rmAt(formidable, rmIdx), minLength));
+        }
+
+        return result;
+    }
+
+    int[] rmAt(int[] target, int targetIdx) {
+
+        List<Integer> resLst = Arrays.stream(target).boxed().collect(Collectors.toList());
+
+        resLst.remove(targetIdx);
+
+        return resLst.stream().mapToInt(i -> i).toArray();
     }
 }
